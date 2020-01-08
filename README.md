@@ -1,0 +1,2 @@
+# MVPSlider
+JQuery plugin
