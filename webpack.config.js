@@ -1,13 +1,12 @@
 const path = require('path');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = env => {
   return {
     entry: [
-      './jquery.MVPSlider.js',
-      './jquery.MVPSlider.sass'
+      './index.ts',
+      './index.sass'
     ],
     context: path.resolve(__dirname, 'src'),
     output: {
@@ -16,22 +15,29 @@ module.exports = env => {
     module: {
       rules: [
         {
-          test: /\.js$/,
+          test: /\.tsx?$/,
+          use: 'ts-loader',
           exclude: /node_modules/,
-          loader: "babel-loader",
-          options: {
-            presets: ['@babel/preset-env']
-          }
         },
+        // {
+        //   test: /\.js$/,
+        //   exclude: /node_modules/,
+        //   loader: "babel-loader",
+        //   options: {
+        //     presets: ['@babel/preset-env']
+        //   }
+        // },
         {
           test: /\.s[ac]ss$/i,
           use: [ MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader', ],
         },
       ]
     },
+    resolve: {
+      extensions: [ '.tsx', '.ts', '.js' ],
+    },
     devtool: env === 'production' ? false : "source-map",
     plugins: [
-      new CleanWebpackPlugin(),
       new MiniCssExtractPlugin({ 
         filename: env === 'production' ? './css/jquery.MVPSlider.min.css' : './css/jquery.MVPSlider.css'
       }),
