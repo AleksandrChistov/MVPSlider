@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
@@ -12,12 +13,15 @@ module.exports = env => {
     output: {
       filename: env === 'production' ? './js/jquery.MVPSlider.min.js' : './js/jquery.MVPSlider.js'
     },
+    externals: {
+      jquery: 'jQuery'
+    },
     module: {
       rules: [
         {
           test: /\.tsx?$/,
           use: 'ts-loader',
-          exclude: /node_modules/,
+          exclude: /node_modules/
         },
         // {
         //   test: /\.js$/,
@@ -44,7 +48,13 @@ module.exports = env => {
       new HtmlWebpackPlugin({
         title:  'MVP range slider',
         template: 'index.html'
-        })
+      }),
+      new webpack.ProvidePlugin({
+        $: 'jquery',
+        jQuery: 'jquery',
+        'window.jQuery': 'jquery',
+        'window.$': 'jquery'
+      })
     ]
   }
 };
