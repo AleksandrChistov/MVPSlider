@@ -1,3 +1,3 @@
 import './Presenter/presenter'
 
-$('#mySlider').MVPSlider({});
+$('#mySlider').MVPSlider({showValue: true});

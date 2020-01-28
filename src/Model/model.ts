@@ -1,11 +1,11 @@
 export interface Idata {
+  min?: number
+  max?: number
   value?: number
   valueFrom?: number
   valueTo?: number
-  showValue?: boolean
-  min?: number
-  max?: number
   step?: number
+  showValue?: boolean
   vertical?: boolean
   interval?: boolean
 }
@@ -13,21 +13,23 @@ export interface Idata {
 export class Model {
   data: Idata
 
-  constructor(data: Idata) {
-    this.data = {
-      value: data.value || 0,
-      valueFrom: data.value || 0,
-      valueTo: data.value || 0,
-      showValue: data.showValue || false,
-      min: data.min || 0,
-      max: data.max || 1000,
-      step: data.step || 50,
-      vertical: data.vertical || false,
-      interval: data.interval || false
-    }
+  constructor({
+    min = 0, 
+    max = 1000,
+    value = max / 2,
+    valueFrom = min,
+    valueTo = (max - min) / 2 + min,
+    step = (max - min) / 20,
+    showValue = false,
+    vertical = false,
+    interval = false
+  }: Idata) {
+    this.data = {min, max, value, valueFrom, valueTo, step, showValue, vertical, interval}
   }
 
   get(): Idata {
+    console.log(this.data);
+    
     return this.data;
   }
 }
