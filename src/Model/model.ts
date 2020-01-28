@@ -1,5 +1,7 @@
 export interface Idata {
   value?: number
+  valueFrom?: number
+  valueTo?: number
   showValue?: boolean
   min?: number
   max?: number
@@ -13,7 +15,9 @@ export class Model {
 
   constructor(data: Idata) {
     this.data = {
-      value: data.value || 500,
+      value: data.value || 0,
+      valueFrom: data.value || 0,
+      valueTo: data.value || 0,
       showValue: data.showValue || false,
       min: data.min || 0,
       max: data.max || 1000,

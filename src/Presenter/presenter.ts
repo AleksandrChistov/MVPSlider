@@ -1,22 +1,27 @@
 import { Idata, Model } from '../Model/model'
+import { View } from '../View/view'
 
 class Presenter {
   model: Model
+  view: View
 
   constructor(options: Idata) {
     this.model = new Model(options);
+    this.view = new View(this.model.get());
+
+
   }
 }
 
 declare global {
   interface JQuery {
-    MVPSlider(options: Idata): Presenter;
+    MVPSlider(options: Idata): void;
   }
 }
 
 (function($){
   $.fn.MVPSlider = function(options: Idata) {
     let presenter = new Presenter(options);
-    return presenter;
+    this.append(presenter.view.getHtml());
   };
 })(jQuery);
