@@ -1,7 +1,11 @@
 .mvps
   font-family: monospace, sans-serif;
   position: relative
-  padding-bottom: 15px
+  height: 55px
+
+.mvps_vertical
+  height: 500px
+  width: 55px
 
 .mvps-line
   display: inline-block
@@ -9,16 +13,28 @@
   height: 2px
   background-color: #c4c4c4
 
+.mvps-line_vertical
+  width: 2px
+  height: 100%
+
 .mvps-max
   float: right
+
+.mvps-max_vertical
+  position: absolute
+  top: 0
+  left: 10px
 
 .mvps-bar
   height: 2px
   width: 50%
   position: absolute
   background-color: #9800ff
-  top: 13px
+  bottom: 40px
   left: 0
+
+.mvps-bar_vertical
+  width: 2px
 
 .mvps-handle
   display: inline-block
@@ -28,15 +44,14 @@
   border: 2px solid #ffffff
   border-radius: 50%
   position: absolute
-  top: 0
-  left: 50%
+  left: 0
   margin-left: -14px
   box-sizing: border-box
   &:hover
     cursor: pointer
 
-.mvps-handle-from
-  left: 0
+.mvps-handle_vertical
+  margin-bottom: -14px
 
 .mvps-label
   width: 34px
@@ -53,5 +68,6 @@
   box-sizing: border-box
   line-height: 16px
 
-.mvps-label-from
-  left: 0
+.mvps-label_vertical
+  left: 35px
+  margin-bottom: -12px
