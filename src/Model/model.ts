@@ -8,6 +8,7 @@ export interface Idata {
   showValue?: boolean
   interval?: boolean
   vertical?: boolean
+  height?: number
 }
 
 export class Model {
@@ -22,9 +23,21 @@ export class Model {
     step = (max - min) / 20,
     showValue = false,
     interval = false,
-    vertical = false
+    vertical = false,
+    height = 500
   }: Idata) {
-    this.data = {min, max, value, valueFrom, valueTo, step, showValue, interval, vertical}
+    this.data = {
+      min, 
+      max, 
+      value, 
+      valueFrom, 
+      valueTo, 
+      step, 
+      showValue, 
+      interval, 
+      vertical, 
+      height
+    }
   }
 
   get(): Idata {

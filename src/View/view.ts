@@ -1,6 +1,7 @@
 import { Idata } from '../Model/model'
 
 export class View {
+  slider: HTMLElement
   base_html: string
   other_html: string
   handle_html: string
@@ -16,7 +17,6 @@ export class View {
   barLeftNumber: number
   barWidthNumber: number
   sliderStyle: {
-    mvps: string
     mvpsLine: string
     mvpsBar: string
     mvpsHandle: string
@@ -24,9 +24,10 @@ export class View {
     mvpsMax: string
   }
 
-  constructor(data: Idata) {
+  constructor(data: Idata, slider: HTMLElement) {
+    this.slider = slider;
+
     this.sliderStyle = {
-      mvps: '',
       mvpsLine: '',
       mvpsBar: '',
       mvpsHandle: '',
@@ -35,24 +36,32 @@ export class View {
     };
     
     if (data.vertical) {
+      this.slider.classList.add('mvps', 'mvps_vertical');
+      this.slider.style.height = data.height + 'px'; 
       this.barLeft = 'bottom';
       this.barWidth = 'height';
       this.barTop = '';
-      this.sliderStyle.mvps = ' mvps_vertical';
       this.sliderStyle.mvpsLine = ' mvps-line_vertical';
       this.sliderStyle.mvpsBar = ' mvps-bar_vertical';
       this.sliderStyle.mvpsHandle = ' mvps-handle_vertical';
       this.sliderStyle.mvpsLabel = ' mvps-label_vertical';
       this.sliderStyle.mvpsMax = ' mvps-max_vertical';
     } else {
+      this.slider.classList.add('mvps');
       this.barLeft = 'left';
       this.barWidth = 'width';
       this.barTop = 'top: 0';
     }
 
-    this.handleAndLabel = `${this.barLeft}:${(data.value - data.min) / (data.max - data.min) * 100}%`;
-    this.handleAndLabelFrom = `${this.barLeft}:${(data.valueFrom - data.min) / (data.max - data.min) * 100}%`;
-    this.handleAndLabelTo = `${this.barLeft}:${(data.valueTo - data.min) / (data.max - data.min) * 100}%`;
+    this.handleAndLabel = `
+      ${this.barLeft}:${(data.value - data.min) / (data.max - data.min) * 100}%
+    `;
+    this.handleAndLabelFrom = `
+      ${this.barLeft}:${(data.valueFrom - data.min) / (data.max - data.min) * 100}%
+    `;
+    this.handleAndLabelTo = `
+      ${this.barLeft}:${(data.valueTo - data.min) / (data.max - data.min) * 100}%
+    `;
 
     this.handle_html = `
     <span class='mvps-handle${this.sliderStyle.mvpsHandle}' 
@@ -73,11 +82,11 @@ export class View {
       </span>
     `
     this.lableInterval_html = `
-      <span class='mvps-label mvps-label-from${this.sliderStyle.mvpsLabel}' style=${this.handleAndLabelFrom}>
-        ${data.valueFrom}
+      <span class='mvps-label mvps-label-from${this.sliderStyle.mvpsLabel}' 
+        style=${this.handleAndLabelFrom}>${data.valueFrom}
       </span>
-      <span class='mvps-label mvps-label-to${this.sliderStyle.mvpsLabel}' style=${this.handleAndLabelTo}>
-        ${data.valueTo}
+      <span class='mvps-label mvps-label-to${this.sliderStyle.mvpsLabel}' 
+        style=${this.handleAndLabelTo}>${data.valueTo}
       </span>
     `
 
@@ -100,15 +109,13 @@ export class View {
     }
     
     this.base_html = `
-      <div class='mvps${this.sliderStyle.mvps}'>
-        <span class='mvps-line${this.sliderStyle.mvpsLine}'></span>
-        <span class='mvps-min'>${data.min}</span>
-        <span class='mvps-max${this.sliderStyle.mvpsMax}'>${data.max}</span>
-        <span class='mvps-bar${this.sliderStyle.mvpsBar}' 
-          style='${this.barLeft}:${this.barLeftNumber}%;${this.barWidth}:${this.barWidthNumber}%'>
-        </span>
-        ${this.other_html}
-      </div>
+      <span class='mvps-line${this.sliderStyle.mvpsLine}'></span>
+      <span class='mvps-min'>${data.min}</span>
+      <span class='mvps-max${this.sliderStyle.mvpsMax}'>${data.max}</span>
+      <span class='mvps-bar${this.sliderStyle.mvpsBar}' 
+        style='${this.barLeft}:${this.barLeftNumber}%;${this.barWidth}:${this.barWidthNumber}%'>
+      </span>
+      ${this.other_html}
     `
   }
 
