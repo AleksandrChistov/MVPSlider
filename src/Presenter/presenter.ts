@@ -20,8 +20,26 @@ declare global {
 }
 
 (function($){
+  
+  let min = 0;
+  let max = 1000;
+
+  let defaults = {
+    min: min, 
+    max: max,
+    value: max / 2,
+    valueFrom: min,
+    valueTo: (max - min) / 2 + min,
+    step: (max - min) / 20,
+    showValue: false,
+    interval: false,
+    vertical: false,
+    height: 500
+  }
+
   $.fn.MVPSlider = function(options: Idata) {
-    let presenter = new Presenter(options, this[0]);
+    let config = $.extend({}, defaults, options);
+    let presenter = new Presenter(config, this[0]);
     this.append(presenter.view.getHtml());
   };
 })(jQuery);

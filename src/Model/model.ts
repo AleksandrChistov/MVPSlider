@@ -14,29 +14,18 @@ export interface Idata {
 export class Model {
   data: Idata
 
-  constructor({
-    min = 0, 
-    max = 1000,
-    value = max / 2,
-    valueFrom = min,
-    valueTo = (max - min) / 2 + min,
-    step = (max - min) / 20,
-    showValue = false,
-    interval = false,
-    vertical = false,
-    height = 500
-  }: Idata) {
+  constructor(options: Idata) {
     this.data = {
-      min, 
-      max, 
-      value, 
-      valueFrom, 
-      valueTo, 
-      step, 
-      showValue, 
-      interval, 
-      vertical, 
-      height
+      min: options.min, 
+      max: options.max, 
+      value: options.value, 
+      valueFrom: options.valueFrom, 
+      valueTo: options.valueTo, 
+      step: options.step, 
+      showValue: options.showValue, 
+      interval: options.interval, 
+      vertical: options.vertical, 
+      height: options.height
     }
   }
 
