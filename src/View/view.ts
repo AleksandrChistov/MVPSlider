@@ -34,7 +34,11 @@ export class View {
       mvpsLabel: '',
       mvpsMax: ''
     };
-    
+
+    this.updateView(data);
+  }
+
+  updateView(data: Idata) {
     if (data.vertical) {
       this.slider.classList.add('mvps', 'mvps_vertical');
       this.slider.style.height = data.height + 'px'; 
@@ -122,4 +126,6 @@ export class View {
   getHtml() {
     return this.base_html;
   }
+
+
 }
