@@ -127,5 +127,5 @@ export class View {
     return this.base_html;
   }
 
-
+  
 }
