@@ -1,4 +1,5 @@
 import { Idata } from '../Model/model'
+import { IEventEmitter } from '../Presenter/presenter'
 
 export class View {
   slider: HTMLElement
@@ -38,7 +39,7 @@ export class View {
     this.updateView(data);
   }
 
-  updateView(data: Idata) {
+  updateView(data: Idata): void {
     if (data.vertical) {
       this.slider.classList.add('mvps', 'mvps_vertical');
       this.slider.style.height = data.height + 'px'; 
@@ -123,9 +124,16 @@ export class View {
     `
   }
 
-  getHtml() {
-    return this.base_html;
+  addChangePositionHandler(emitter: IEventEmitter) {
+    let handles = this.slider.querySelectorAll('.mvps-handle');
+    handles.forEach(handle => {
+      handle.addEventListener('click', (event) => {
+        emitter.emit('changePositionHandle', {e: event});
+      });
+    });
   }
 
-  
+  getHtml(): string {
+    return this.base_html;
+  }
 }

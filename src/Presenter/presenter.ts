@@ -1,7 +1,13 @@
 import { Idata, Model } from '../Model/model'
 import { View } from '../View/view'
 
-class EventEmitter {
+export interface IEventEmitter {
+  events: {}
+  subscribe: (eventName: string, fn: ()=>void)=>void
+  emit: (eventName: string, data: {})=>void
+}
+
+class EventEmitter implements IEventEmitter {
   events: {
     [eventName: string]: Array<(data: {})=>void>
   }
@@ -10,7 +16,7 @@ class EventEmitter {
     this.events = {};
   }
 
-  subscribe(eventName: string, fn: (data: {})=>void): ()=>void{
+  subscribe(eventName: string, fn: (data: {e: Event})=>void): ()=>void {
     if ( !this.events[eventName] ) {
       this.events[eventName] = [];
     }   
@@ -22,7 +28,7 @@ class EventEmitter {
     }
   }
   
-  emit(eventName: string, data: {}){
+  emit(eventName: string, data: {}): void {
     this.events[eventName].forEach(fn => fn(data));
   }
 }
@@ -34,10 +40,6 @@ class Presenter {
   constructor(options: Idata, slider: HTMLElement) {
     this.model = new Model(options);
     this.view = new View(this.model.get(), slider);
-
-    let emitter = new EventEmitter();
-    
-    // реагировать на сообщения
   }
 }
 
@@ -50,6 +52,15 @@ declare global {
 (function($){
   $.fn.MVPSlider = function(options: Idata) {
     let presenter = new Presenter(options, this[0]);
+
+    let emitter = new EventEmitter();
+
     this.append(presenter.view.getHtml());
+
+    emitter.subscribe('changePositionHandle', (data)=> {
+      console.log('Метод модели', data.e);
+    });
+
+    presenter.view.addChangePositionHandler(emitter);
   };
 })(jQuery);
