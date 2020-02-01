@@ -1,4 +1,4 @@
-export interface Idata {
+export interface Ioptions {
   min?: number
   max?: number
   value?: number
@@ -9,10 +9,18 @@ export interface Idata {
   interval?: boolean
   vertical?: boolean
   height?: number
+  [key: string]: number | boolean
+}
+
+export interface Idata {
+  e?: MouseEvent
 }
 
 export class Model {
-  data: Idata
+  options: Ioptions
+  startPositionHandle: number
+  orientationSlider: keyof MouseEvent
+  value: string
 
   constructor({
     min = 0, 
@@ -25,8 +33,8 @@ export class Model {
     interval = false,
     vertical = false,
     height = 500
-  }: Idata) {
-    this.data = {
+  }: Ioptions) {
+    this.options = {
       min, 
       max, 
       value, 
@@ -38,11 +46,42 @@ export class Model {
       vertical, 
       height
     }
+    this.startPositionHandle = 0;
+    this.orientationSlider = 'pageY';
+    this.value = 'value';
   }
 
-  get(): Idata {
-    console.log(this.data);
+  addStartingPositionHandle(data: Idata) {
+    this.value = (<HTMLElement>data.e.target).dataset.value;
+
+    if (this.value === 'value') {
+      this.orientationSlider = 'pageX';
+    }
+
+    this.startPositionHandle = +data.e[this.orientationSlider];
+
+    console.log(data.e[this.orientationSlider]);
+  }
+
+  changeValue(data: Idata) {
+    if (this.startPositionHandle > data.e[this.orientationSlider]) {
+      this.startPositionHandle = this.startPositionHandle - +data.e[this.orientationSlider];
+      this.options[this.value] = +this.options[this.value] - this.startPositionHandle;
+    }
+
+    if (this.startPositionHandle < data.e[this.orientationSlider]) {
+      this.startPositionHandle = +data.e[this.orientationSlider] - this.startPositionHandle;
+      this.options[this.value] = +this.options[this.value] + this.startPositionHandle;
+    }
+
     
-    return this.data;
+    // координаты x или y
+    // одиночный или двойной?
+    // левый или правый?
+  }
+
+  get(): Ioptions {
+    console.log(this.options);
+    return this.options;
   }
 }

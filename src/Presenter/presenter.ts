@@ -1,4 +1,4 @@
-import { Idata, Model } from '../Model/model'
+import { Ioptions, Idata, Model } from '../Model/model'
 import { View } from '../View/view'
 
 export interface IEventEmitter {
@@ -16,7 +16,7 @@ class EventEmitter implements IEventEmitter {
     this.events = {};
   }
 
-  subscribe(eventName: string, fn: (data: {e: Event})=>void): ()=>void {
+  subscribe(eventName: string, fn: (data: Idata)=>void): ()=>void {
     if ( !this.events[eventName] ) {
       this.events[eventName] = [];
     }   
@@ -37,7 +37,7 @@ class Presenter {
   model: Model
   view: View
 
-  constructor(options: Idata, slider: HTMLElement) {
+  constructor(options: Ioptions, slider: HTMLElement) {
     this.model = new Model(options);
     this.view = new View(this.model.get(), slider);
   }
@@ -45,20 +45,24 @@ class Presenter {
 
 declare global {
   interface JQuery {
-    MVPSlider(options: Idata): void;
+    MVPSlider(options: Ioptions): void;
   }
 }
 
 (function($){
-  $.fn.MVPSlider = function(options: Idata) {
+  $.fn.MVPSlider = function(options: Ioptions) {
     let presenter = new Presenter(options, this[0]);
 
     let emitter = new EventEmitter();
 
     this.append(presenter.view.getHtml());
 
-    emitter.subscribe('changePositionHandle', (data)=> {
-      console.log('Метод модели', data.e);
+    emitter.subscribe('addStartingPositionHandle', (data) => {
+      presenter.model.addStartingPositionHandle(data);
+    });
+
+    emitter.subscribe('changePositionHandle', (data) => {
+      presenter.model.changeValue(data);
     });
 
     presenter.view.addChangePositionHandler(emitter);

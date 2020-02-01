@@ -1,4 +1,4 @@
-import { Idata } from '../Model/model'
+import { Ioptions } from '../Model/model'
 import { IEventEmitter } from '../Presenter/presenter'
 
 export class View {
@@ -25,7 +25,7 @@ export class View {
     mvpsMax: string
   }
 
-  constructor(data: Idata, slider: HTMLElement) {
+  constructor(options: Ioptions, slider: HTMLElement) {
     this.slider = slider;
 
     this.sliderStyle = {
@@ -36,13 +36,13 @@ export class View {
       mvpsMax: ''
     };
 
-    this.updateView(data);
+    this.renderView(options);
   }
 
-  updateView(data: Idata): void {
-    if (data.vertical) {
+  renderView(options: Ioptions): void {
+    if (options.vertical) {
       this.slider.classList.add('mvps', 'mvps_vertical');
-      this.slider.style.height = data.height + 'px'; 
+      this.slider.style.height = options.height + 'px'; 
       this.barLeft = 'bottom';
       this.barWidth = 'height';
       this.barTop = '';
@@ -59,64 +59,64 @@ export class View {
     }
 
     this.handleAndLabel = `
-      ${this.barLeft}:${(data.value - data.min) / (data.max - data.min) * 100}%
+      ${this.barLeft}:${(options.value - options.min) / (options.max - options.min) * 100}%
     `;
     this.handleAndLabelFrom = `
-      ${this.barLeft}:${(data.valueFrom - data.min) / (data.max - data.min) * 100}%
+      ${this.barLeft}:${(options.valueFrom - options.min) / (options.max - options.min) * 100}%
     `;
     this.handleAndLabelTo = `
-      ${this.barLeft}:${(data.valueTo - data.min) / (data.max - data.min) * 100}%
+      ${this.barLeft}:${(options.valueTo - options.min) / (options.max - options.min) * 100}%
     `;
 
     this.handle_html = `
-    <span class='mvps-handle${this.sliderStyle.mvpsHandle}' 
+    <span class='mvps-handle${this.sliderStyle.mvpsHandle}' data-value='value' 
       style='${this.handleAndLabel};${this.barTop}'>
     </span>`
 
     this.lable_html = `
     <span class='mvps-label${this.sliderStyle.mvpsLabel}' style=${this.handleAndLabel}>
-      ${data.value}
+      ${options.value}
     </span>`
 
     this.handleInterval_html = `
       <span class='mvps-handle mvps-handle-from${this.sliderStyle.mvpsHandle}' 
-        style='${this.handleAndLabelFrom};${this.barTop}'>
+        data-value='valueFrom' style='${this.handleAndLabelFrom};${this.barTop}'>
       </span>
       <span class='mvps-handle mvps-handle-to${this.sliderStyle.mvpsHandle}' 
-        style='${this.handleAndLabelTo};${this.barTop}'>
+        data-value='valueTo' style='${this.handleAndLabelTo};${this.barTop}'>
       </span>
     `
     this.lableInterval_html = `
       <span class='mvps-label mvps-label-from${this.sliderStyle.mvpsLabel}' 
-        style=${this.handleAndLabelFrom}>${data.valueFrom}
+        style=${this.handleAndLabelFrom}>${options.valueFrom}
       </span>
       <span class='mvps-label mvps-label-to${this.sliderStyle.mvpsLabel}' 
-        style=${this.handleAndLabelTo}>${data.valueTo}
+        style=${this.handleAndLabelTo}>${options.valueTo}
       </span>
     `
 
-    if (data.interval && data.showValue) {
+    if (options.interval && options.showValue) {
       this.other_html = this.handleInterval_html + this.lableInterval_html;
-      this.barWidthNumber = (data.valueTo - data.valueFrom) / (data.max - data.min) * 100;
-      this.barLeftNumber = (data.valueFrom - data.min) / (data.max - data.min) * 100;
-    } else if (data.interval && !data.showValue) {
+      this.barWidthNumber = (options.valueTo - options.valueFrom) / (options.max - options.min) * 100;
+      this.barLeftNumber = (options.valueFrom - options.min) / (options.max - options.min) * 100;
+    } else if (options.interval && !options.showValue) {
       this.other_html = this.handleInterval_html;
-      this.barWidthNumber = (data.valueTo - data.valueFrom) / (data.max - data.min) * 100;
-      this.barLeftNumber = (data.valueFrom - data.min) / (data.max - data.min) * 100;
-    } else if (!data.interval && data.showValue) {
+      this.barWidthNumber = (options.valueTo - options.valueFrom) / (options.max - options.min) * 100;
+      this.barLeftNumber = (options.valueFrom - options.min) / (options.max - options.min) * 100;
+    } else if (!options.interval && options.showValue) {
       this.other_html = this.handle_html + this.lable_html;
-      this.barWidthNumber = (data.value - data.min) / (data.max - data.min) * 100;
+      this.barWidthNumber = (options.value - options.min) / (options.max - options.min) * 100;
       this.barLeftNumber = 0;
     } else {
       this.other_html = this.handle_html;
-      this.barWidthNumber = (data.value - data.min) / (data.max - data.min) * 100;
+      this.barWidthNumber = (options.value - options.min) / (options.max - options.min) * 100;
       this.barLeftNumber = 0;
     }
     
     this.base_html = `
       <span class='mvps-line${this.sliderStyle.mvpsLine}'></span>
-      <span class='mvps-min'>${data.min}</span>
-      <span class='mvps-max${this.sliderStyle.mvpsMax}'>${data.max}</span>
+      <span class='mvps-min'>${options.min}</span>
+      <span class='mvps-max${this.sliderStyle.mvpsMax}'>${options.max}</span>
       <span class='mvps-bar${this.sliderStyle.mvpsBar}' 
         style='${this.barLeft}:${this.barLeftNumber}%;${this.barWidth}:${this.barWidthNumber}%'>
       </span>
@@ -127,8 +127,22 @@ export class View {
   addChangePositionHandler(emitter: IEventEmitter) {
     let handles = this.slider.querySelectorAll('.mvps-handle');
     handles.forEach(handle => {
-      handle.addEventListener('click', (event) => {
-        emitter.emit('changePositionHandle', {e: event});
+      handle.addEventListener('mousedown', (event) => {
+        if ((<KeyboardEvent>event).which == 1) {
+          emitter.emit('addStartingPositionHandle', {e: event});
+
+          document.onmousemove = (event) => {
+            // emit события в Model каждый раз при изменении
+            emitter.emit('changePositionHandle', {e: event});
+            console.log('Координаты', event);
+          };
+          document.onmouseup = () => {
+            document.onmousemove = document.onmouseup = null;
+            // emit события в Model последний раз 
+            emitter.emit('changePositionHandle', {e: event});
+            console.log('Отписались!');
+          };
+        }
       });
     });
   }
