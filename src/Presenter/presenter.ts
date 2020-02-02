@@ -28,7 +28,7 @@ class EventEmitter implements IEventEmitter {
     }
   }
   
-  emit(eventName: string, data: {}): void {
+  emit(eventName: string, data: Idata): void {
     this.events[eventName].forEach(fn => fn(data));
   }
 }
@@ -61,8 +61,12 @@ declare global {
       presenter.model.addStartingPositionHandle(data);
     });
 
-    emitter.subscribe('changePositionHandle', (data) => {
+    emitter.subscribe('changeValue', (data) => {
       presenter.model.changeValue(data);
+    });
+
+    emitter.subscribe('updateView', (data) => {
+      presenter.view.updateView(data);
     });
 
     presenter.view.addChangePositionHandler(emitter);

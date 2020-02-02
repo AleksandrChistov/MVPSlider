@@ -1,3 +1,5 @@
+import { IEventEmitter } from "../Presenter/presenter"
+
 export interface Ioptions {
   min?: number
   max?: number
@@ -9,18 +11,21 @@ export interface Ioptions {
   interval?: boolean
   vertical?: boolean
   height?: number
-  [key: string]: number | boolean
+  [key: string]: number | boolean | MouseEvent | IEventEmitter | string
 }
 
-export interface Idata {
+export interface Idata extends Ioptions {
   e?: MouseEvent
+  emitter?: IEventEmitter
+  valueString?: string
 }
 
 export class Model {
   options: Ioptions
-  startPositionHandle: number
+  positionHandle: number
   orientationSlider: keyof MouseEvent
   value: string
+  balance: number
 
   constructor({
     min = 0, 
@@ -46,9 +51,10 @@ export class Model {
       vertical, 
       height
     }
-    this.startPositionHandle = 0;
+    this.positionHandle = 0;
     this.orientationSlider = 'pageY';
     this.value = 'value';
+    this.balance = 0;
   }
 
   addStartingPositionHandle(data: Idata) {
@@ -58,26 +64,64 @@ export class Model {
       this.orientationSlider = 'pageX';
     }
 
-    this.startPositionHandle = +data.e[this.orientationSlider];
+    this.positionHandle = +data.e[this.orientationSlider];
 
-    console.log(data.e[this.orientationSlider]);
+    console.log(this.positionHandle);
   }
 
   changeValue(data: Idata) {
-    if (this.startPositionHandle > data.e[this.orientationSlider]) {
-      this.startPositionHandle = this.startPositionHandle - +data.e[this.orientationSlider];
-      this.options[this.value] = +this.options[this.value] - this.startPositionHandle;
+    if (this.value === 'value') {
+      if (this.positionHandle > data.e[this.orientationSlider]) {
+        console.log(data.e[this.orientationSlider]);
+        console.log(this.positionHandle);
+        this.balance = this.positionHandle - +data.e[this.orientationSlider];
+        console.log(this.balance);
+        console.log(this.options[this.value]);
+        this.options[this.value] = +this.options[this.value] - this.balance;
+        console.log(this.options[this.value]);
+      }
+  
+      if (this.positionHandle < data.e[this.orientationSlider]) {
+        console.log(+data.e[this.orientationSlider]);
+        console.log(this.positionHandle);
+        this.balance = +data.e[this.orientationSlider] - this.positionHandle;
+        console.log(this.balance);
+        console.log(+this.options[this.value]);
+        this.options[this.value] = +this.options[this.value] + this.balance;
+        console.log(this.options[this.value]);
+      }
+    } else {
+      if (this.positionHandle > data.e[this.orientationSlider]) {
+        console.log(+data.e[this.orientationSlider]);
+        console.log(this.positionHandle);
+        this.balance = this.positionHandle - +data.e[this.orientationSlider];
+        console.log(this.balance);
+        console.log(+this.options[this.value]);
+        this.options[this.value] = +this.options[this.value] + this.balance;
+        console.log(this.options[this.value]);
+      }
+  
+      if (this.positionHandle < data.e[this.orientationSlider]) {
+        console.log(data.e[this.orientationSlider]);
+        console.log(this.positionHandle);
+        this.balance = +data.e[this.orientationSlider] - this.positionHandle;
+        console.log(this.balance);
+        console.log(this.options[this.value]);
+        this.options[this.value] = +this.options[this.value] - this.balance;
+        console.log(this.options[this.value]);
+      }
     }
-
-    if (this.startPositionHandle < data.e[this.orientationSlider]) {
-      this.startPositionHandle = +data.e[this.orientationSlider] - this.startPositionHandle;
-      this.options[this.value] = +this.options[this.value] + this.startPositionHandle;
-    }
-
     
-    // координаты x или y
-    // одиночный или двойной?
-    // левый или правый?
+    this.positionHandle = +data.e[this.orientationSlider];
+    data.emitter.emit('updateView', {
+      valueString: this.value, 
+      value: this.options[this.value],
+      valueFrom: this.options.valueFrom,
+      valueTo: this.options.valueTo,
+      min: this.options.min,
+      max: this.options.max,
+      e: data.e
+    });
   }
 
   get(): Ioptions {

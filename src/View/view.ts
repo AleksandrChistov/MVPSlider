@@ -1,8 +1,11 @@
-import { Ioptions } from '../Model/model'
+import { Ioptions, Idata } from '../Model/model'
 import { IEventEmitter } from '../Presenter/presenter'
 
 export class View {
   slider: HTMLElement
+  handleTo: HTMLElement
+  handleFrom?: HTMLElement
+  bar?: HTMLElement
   base_html: string
   other_html: string
   handle_html: string
@@ -124,26 +127,64 @@ export class View {
     `
   }
 
-  addChangePositionHandler(emitter: IEventEmitter) {
-    let handles = this.slider.querySelectorAll('.mvps-handle');
-    handles.forEach(handle => {
-      handle.addEventListener('mousedown', (event) => {
-        if ((<KeyboardEvent>event).which == 1) {
-          emitter.emit('addStartingPositionHandle', {e: event});
+  updateView(data: Idata) {
+    this.handleAndLabel = `${(data.value - data.min) / (data.max - data.min) * 100}%`;
 
-          document.onmousemove = (event) => {
-            // emit события в Model каждый раз при изменении
-            emitter.emit('changePositionHandle', {e: event});
-            console.log('Координаты', event);
-          };
-          document.onmouseup = () => {
-            document.onmousemove = document.onmouseup = null;
-            // emit события в Model последний раз 
-            emitter.emit('changePositionHandle', {e: event});
-            console.log('Отписались!');
-          };
-        }
-      });
+    if (data.valueString === 'value') {
+      this.handleTo.style.left = this.handleAndLabel;
+      this.bar.style.width = this.handleAndLabel;
+    } 
+
+    if (data.valueString === 'valueFrom') {
+      this.handleFrom.style.bottom = this.handleAndLabel;
+      this.bar.style.height = (data.valueTo - data.valueFrom) / (data.max - data.min) * 100 + '%';
+      this.bar.style.bottom = (data.valueFrom - data.min) / (data.max - data.min) * 100 + '%';
+    }
+
+    if (data.valueString === 'valueTo') {
+      this.handleTo.style.bottom = this.handleAndLabel;
+      this.bar.style.height = (data.valueTo - data.valueFrom) / (data.max - data.min) * 100 + '%';
+      this.bar.style.bottom = (data.valueFrom - data.min) / (data.max - data.min) * 100 + '%';
+    }
+
+    this.handleAndLabelTo = `
+      ${this.barLeft}:${(data.valueTo - data.min) / (data.max - data.min) * 100}%
+    `;
+    console.log(data.value);
+  }
+
+  addChangePositionHandler(emitter: IEventEmitter) {
+    this.bar = this.slider.querySelector('.mvps-bar');
+    this.handleTo = this.slider.querySelector('.mvps-handle-to');
+
+    if (this.handleTo) {
+      this.addEventListener(emitter, this.handleTo);
+      this.handleFrom = this.slider.querySelector('.mvps-handle-from');
+      this.addEventListener(emitter, this.handleFrom);
+    } else {
+      this.handleTo = this.slider.querySelector('.mvps-handle');
+      this.addEventListener(emitter, this.handleTo);
+    }
+  }
+
+  addEventListener(emitter: IEventEmitter, handle: HTMLElement) {
+    handle.addEventListener('mousedown', (event) => {
+      if (event.which == 1) {
+        emitter.emit('addStartingPositionHandle', {e: event});
+
+        document.onmousemove = (event) => {
+          // emit события в Model каждый раз при изменении
+          emitter.emit('changeValue', {e: event, emitter});
+          console.log('Координаты', event);
+        };
+
+        document.onmouseup = (event) => {
+          document.onmousemove = document.onmouseup = null;
+          // emit события в Model последний раз 
+          emitter.emit('changeValue', {e: event, emitter});
+          console.log('Отписались!');
+        };
+      }
     });
   }
 
